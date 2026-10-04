@@ -10,7 +10,7 @@ pub fn create_router(state: AppState) -> Router {
 }
 
 async fn health(State(state): State<AppState>) -> Result<ApiResponse, AppError> {
-    sqlx::query("SELxECT 1")
+    sqlx::query("SELECT 1")
         .execute(&state.database)
         .await
         .map_err(|_| AppError::Internal("Database connection failed".into()))?;

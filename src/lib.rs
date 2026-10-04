@@ -14,7 +14,7 @@ pub struct AppState {
 }
 
 // === api response =======================================================================
-enum ApiResponse {
+pub enum ApiResponse {
     Ok,
     Created,
     Json(StatusCode, serde_json::Value),
@@ -31,7 +31,7 @@ impl IntoResponse for ApiResponse {
 }
 
 // === error response =======================================================================
-enum AppError {
+pub enum AppError {
     NotFound(String),
     BadRequest(String),
     Unauthorized,
