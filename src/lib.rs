@@ -3,8 +3,15 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use sqlx::PgPool;
 
 pub mod routes;
+
+#[derive(Clone)]
+pub struct AppState {
+    pub app_name: String,
+    pub database: PgPool,
+}
 
 // === api response =======================================================================
 enum ApiResponse {
