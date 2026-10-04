@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17  # Explicitly lock to a major version
+    restart: always
+    environment:
+      POSTGRES_USER: dropbox
+      POSTGRES_PASSWORD: dropbox
+      POSTGRES_DB: dropbox
+    ports:
+      - "5000:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+    name: dropbox
