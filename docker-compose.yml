@@ -1,8 +1,8 @@
-version: '3.8'
-
+version: "3.8"
+name: dropbox-api
 services:
   db:
-    image: postgres:17  # Explicitly lock to a major version
+    image: postgres:17 # Explicitly lock to a major version
     restart: always
     environment:
       POSTGRES_USER: dropbox
