@@ -1,11 +1,17 @@
-use axum::{Router, extract::State, http::StatusCode, routing::get};
+use axum::{
+    Router,
+    extract::State,
+    http::StatusCode,
+    routing::{get, post},
+};
 use serde_json::json;
 
-use crate::{ApiResponse, AppError, AppState};
+use crate::{ApiResponse, AppError, AppState, handlers::auth_handler::sign_up};
 
 pub fn create_router(state: AppState) -> Router {
     return Router::new()
         .route("/health", get(health))
+        .route("/auth/sign-up", post(sign_up))
         .with_state(state);
 }
 

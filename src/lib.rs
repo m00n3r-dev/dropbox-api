@@ -6,6 +6,7 @@ use axum::{
 use sqlx::PgPool;
 
 pub mod routes;
+pub mod handlers;
 
 #[derive(Clone)]
 pub struct AppState {
