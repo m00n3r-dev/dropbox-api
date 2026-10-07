@@ -1,4 +1,4 @@
-use api::{AppState, routes};
+use api::{AppState, routes::{self, router}};
 use axum::http::{HeaderValue, Method};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
@@ -40,7 +40,7 @@ async fn main() {
     };
 
     // === server ===
-    let mut app = routes::create_router(state);
+    let mut app = routes::router::create_router(state);
 
     // === cors setup ===
 
