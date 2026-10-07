@@ -4,6 +4,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use sqlx::PgPool;
+use validator::ValidationErrors;
 
 pub mod handlers;
 pub mod routes;
@@ -54,6 +55,12 @@ impl IntoResponse for AppError {
             }
         };
 
-        (status, Json(serde_json::json!({ "error": message }))).into_response()
+        (status, Json(serde_json::json!({ "message": message }))).into_response()
+    }
+}
+
+impl From<ValidationErrors> for AppError {
+    fn from(error: ValidationErrors) -> Self {
+        AppError::BadRequest(error.to_string())
     }
 }
