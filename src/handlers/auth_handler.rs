@@ -17,9 +17,6 @@ pub struct SignUpRequest {
 
     #[validate(length(min = 8, message = "password must be at least 8 characters"))]
     password: String,
-
-    #[validate(length(min = 8, message = "mobile number is required"))]
-    mobile: String,
 }
 
 pub async fn sign_up(Json(payload): Json<SignUpRequest>) -> Result<ApiResponse, AppError> {
