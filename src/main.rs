@@ -1,4 +1,4 @@
-use api::{AppState, routes::{self, router}};
+use api::{AppState, routes::{self}};
 use axum::http::{HeaderValue, Method};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
