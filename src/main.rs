@@ -1,5 +1,7 @@
 use api::{AppState, routes};
+use axum::http::{HeaderValue, Method};
 use sqlx::postgres::PgPoolOptions;
+use tower_http::cors::CorsLayer;
 use tracing_subscriber::{EnvFilter, fmt};
 
 #[tokio::main]
@@ -38,7 +40,19 @@ async fn main() {
     };
 
     // === server ===
-    let app = routes::create_router(state);
+    let mut app = routes::create_router(state);
+
+    // === cors setup ===
+
+    let frontend_url = std::env::var("FRONTEND_URL").expect("FRONTEND_URL must be set");
+    let cors = CorsLayer::new()
+        .allow_origin(frontend_url.parse::<HeaderValue>().unwrap())
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_headers([
+            axum::http::header::CONTENT_TYPE,
+            axum::http::header::AUTHORIZATION,
+        ]);
+    app = app.layer(cors);
 
     let port: u16 = std::env::var("PORT")
         .unwrap_or("3000".to_string())
