@@ -7,7 +7,9 @@ use sqlx::PgPool;
 use validator::ValidationErrors;
 
 pub mod handlers;
+pub mod models;
 pub mod routes;
+pub mod utils;
 
 #[derive(Clone)]
 pub struct AppState {

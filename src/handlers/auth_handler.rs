@@ -1,7 +1,8 @@
-use crate::{ApiResponse, AppError};
-use axum::{Json, http::StatusCode};
+use crate::{ApiResponse, AppError, AppState, models::user::User, utils::password::hash_password};
+use axum::{Json, extract::State, http::StatusCode};
 use serde::Deserialize;
 use serde_json::json;
+use uuid::Uuid;
 use validator::Validate;
 
 // === sign up ===
@@ -19,8 +20,27 @@ pub struct SignUpRequest {
     password: String,
 }
 
-pub async fn sign_up(Json(payload): Json<SignUpRequest>) -> Result<ApiResponse, AppError> {
+pub async fn sign_up(
+    Json(payload): Json<SignUpRequest>,
+    State(state): State<AppState>,
+) -> Result<ApiResponse, AppError> {
     payload.validate()?;
+
+    let password_hash = hash_password(&payload.password)?;
+
+    let user = sqlx::query_as::<_, User>(
+        r#"
+        INSERT INTO users (id,username,email,password_hash)
+        VALUES($1,$2,$3,$4)
+        RETURNING id,username,password_hash,email,created_at
+        "#,
+    )
+    .bind(Uuid::new_v4())
+    .bind(&payload.username)
+    .bind(&password_hash)
+    .bind(&payload.email)
+    .fetch_one(&state.database)
+    .await?;
 
     return Result::Ok(ApiResponse::Json(
         StatusCode::CREATED,
