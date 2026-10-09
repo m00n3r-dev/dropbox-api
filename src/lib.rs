@@ -10,6 +10,8 @@ pub mod handlers;
 pub mod models;
 pub mod routes;
 pub mod utils;
+pub mod services;
+pub mod repositories;
 
 #[derive(Clone)]
 pub struct AppState {
