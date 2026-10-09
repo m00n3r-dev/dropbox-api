@@ -66,21 +66,28 @@ pub async fn sign_in(
     let login_data =
         auth_service::login(&state.database, &payload.email, &payload.password).await?;
 
-    let cookie_age = 60 * 60 * 24 * 30;
-    let cookie = format!(
+    let mut response =
+        ApiResponse::Json(StatusCode::OK, json!({"message":"sign in successful"})).into_response();
+
+    let access_cookie_age = 60 * 15; // 15 minutes
+    let access_cookie = format!(
         "access_token={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
-        &login_data.access_token, cookie_age
+        login_data.access_token, access_cookie_age
+    );
+    response.headers_mut().append(
+        SET_COOKIE,
+        HeaderValue::from_str(&access_cookie)
+            .map_err(|_| AppError::Internal("something went wrong!".into()))?,
     );
 
-    let mut response = ApiResponse::Json(
-        StatusCode::OK,
-        json!({"message":"sign in successful","access_token":&login_data.access_token,"refresh_token":&login_data.refresh_token}),
-    )
-    .into_response();
-
-    response.headers_mut().insert(
+    let refresh_cookie_age = 60 * 60 * 24 * 30; // 30 days
+    let refresh_cookie = format!(
+        "refresh_token={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        login_data.refresh_token, refresh_cookie_age
+    );
+    response.headers_mut().append(
         SET_COOKIE,
-        HeaderValue::from_str(&cookie)
+        HeaderValue::from_str(&refresh_cookie)
             .map_err(|_| AppError::Internal("something went wrong!".into()))?,
     );
 
