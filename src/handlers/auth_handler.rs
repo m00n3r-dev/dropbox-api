@@ -1,10 +1,15 @@
-use crate::{ApiResponse, AppError, AppState, services::auth_service, utils::jwt};
+use crate::{
+    ApiResponse, AppError, AppState,
+    services::auth_service,
+    utils::jwt::{self, verify_token},
+};
 use axum::{
     Json,
     extract::State,
     http::{HeaderValue, StatusCode, header::SET_COOKIE},
     response::IntoResponse,
 };
+use axum_extra::extract::CookieJar;
 use serde::Deserialize;
 use serde_json::json;
 use validator::Validate;
@@ -86,4 +91,16 @@ pub async fn sign_in(
     );
 
     Ok(response)
+}
+
+// === validate user ===
+pub async fn me(jar: CookieJar) -> Result<ApiResponse, AppError> {
+    let token = jar
+        .get("access_token")
+        .map(|cookie| cookie.value())
+        .ok_or(AppError::Unauthorized)?;
+
+    let claims = verify_token(token).map_err(|_| AppError::Unauthorized)?;
+
+    Ok(ApiResponse::Json(StatusCode::OK, json!(claims)))
 }
