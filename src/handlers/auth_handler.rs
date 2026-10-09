@@ -57,8 +57,10 @@ pub async fn sign_in(
 ) -> Result<ApiResponse, AppError> {
     payload.validate()?;
 
+    let user = auth_service::login(&state.database, &payload.email, &payload.password).await?;
+
     return Result::Ok(ApiResponse::Json(
         StatusCode::OK,
-        json!({"message":"sign in successful"}),
+        json!({"message":"sign in successful","data":user}),
     ));
 }

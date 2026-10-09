@@ -1,7 +1,10 @@
 use sqlx::PgPool;
 
 use crate::{
-    AppError, models::user::User, repositories::user_repository, utils::password::hash_password,
+    AppError,
+    models::user::User,
+    repositories::user_repository,
+    utils::password::{hash_password, verify_password},
 };
 
 pub async fn register(
@@ -28,8 +31,12 @@ pub async fn register(
 pub async fn login(db: &PgPool, email: &str, password: &str) -> Result<User, AppError> {
     let email_exists = user_repository::email_exists(db, email).await?;
     if !email_exists {
-        return Err(AppError::Unauthorized("Email or password wrong".into()));
+        return Err(AppError::BadRequest("Email or password wrong".into()));
     }
 
-    
+    let user = user_repository::get_user_from_email(db, email).await?;
+
+    verify_password(password, &user.password_hash)?;
+
+    Ok(user)
 }

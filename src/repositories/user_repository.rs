@@ -37,3 +37,12 @@ pub async fn username_exists(db: &PgPool, username: &str) -> Result<bool, sqlx::
         .fetch_one(db)
         .await;
 }
+
+pub async fn get_user_from_email(db: &PgPool, email: &str) -> Result<User, sqlx::Error> {
+    return sqlx::query_as::<_, User>(
+        "SELECT id,username,email,password_hash,created_at FROM users WHERE email = $1",
+    )
+    .bind(email)
+    .fetch_one(db)
+    .await;
+}
