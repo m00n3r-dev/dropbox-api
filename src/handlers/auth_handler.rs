@@ -21,8 +21,8 @@ pub struct SignUpRequest {
 }
 
 pub async fn sign_up(
-    Json(payload): Json<SignUpRequest>,
     State(state): State<AppState>,
+    Json(payload): Json<SignUpRequest>,
 ) -> Result<ApiResponse, AppError> {
     payload.validate()?;
 
