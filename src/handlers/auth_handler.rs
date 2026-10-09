@@ -59,11 +59,11 @@ pub async fn sign_in(
 
     let user = auth_service::login(&state.database, &payload.email, &payload.password).await?;
 
-    let jwt_token = jwt::create_token(user.id, user.email, user.username)
+    let token = jwt::create_token(user.id, user.email, user.username)
         .map_err(|_| AppError::Internal("something went wrong!".into()))?;
 
     return Result::Ok(ApiResponse::Json(
         StatusCode::OK,
-        json!({"message":"sign in successful","jwt_token":jwt_token}),
+        json!({"message":"sign in successful","token":token}),
     ));
 }
