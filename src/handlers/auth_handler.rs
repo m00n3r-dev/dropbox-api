@@ -1,8 +1,4 @@
-use crate::{
-    ApiResponse, AppError, AppState,
-    services::auth_service,
-    utils::jwt::{self, verify_token},
-};
+use crate::{ApiResponse, AppError, AppState, services::auth_service, utils::jwt::verify_token};
 use axum::{
     Json,
     extract::State,
@@ -67,20 +63,18 @@ pub async fn sign_in(
 ) -> Result<axum::response::Response, AppError> {
     payload.validate()?;
 
-    let user = auth_service::login(&state.database, &payload.email, &payload.password).await?;
-
-    let token = jwt::create_token(user.id, user.email, user.username)
-        .map_err(|_| AppError::Internal("something went wrong!".into()))?;
+    let login_data =
+        auth_service::login(&state.database, &payload.email, &payload.password).await?;
 
     let cookie_age = 60 * 60 * 24 * 30;
     let cookie = format!(
         "access_token={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
-        token, cookie_age
+        &login_data.access_token, cookie_age
     );
 
     let mut response = ApiResponse::Json(
         StatusCode::OK,
-        json!({"message":"sign in successful","token":token}),
+        json!({"message":"sign in successful","access_token":&login_data.access_token,"refresh_token":&login_data.refresh_token}),
     )
     .into_response();
 

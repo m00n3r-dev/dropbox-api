@@ -20,7 +20,7 @@ pub fn create_token(
         sub: user_id.to_string(),
         username: username,
         email: email,
-        exp: (chrono::Utc::now().timestamp() + 3600 * 24 * 30) as usize,
+        exp: (chrono::Utc::now().timestamp() + 15 * 60) as usize,
     };
 
     encode(
