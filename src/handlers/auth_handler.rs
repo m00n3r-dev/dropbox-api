@@ -38,3 +38,27 @@ pub async fn sign_up(
         json!({"message":"sign up successful","user_id":user.id}),
     ));
 }
+
+// === sign in ===
+#[derive(Debug, Deserialize, Validate, Default)]
+#[serde(default)]
+pub struct SignInRequest {
+    #[validate(length(min = 1, message = "email is required"))]
+    #[validate(email(message = "invalid email address"))]
+    email: String,
+
+    #[validate(length(min = 8, message = "password must be at least 8 characters"))]
+    password: String,
+}
+
+pub async fn sign_in(
+    State(state): State<AppState>,
+    Json(payload): Json<SignInRequest>,
+) -> Result<ApiResponse, AppError> {
+    payload.validate()?;
+
+    return Result::Ok(ApiResponse::Json(
+        StatusCode::OK,
+        json!({"message":"sign in successful"}),
+    ));
+}
