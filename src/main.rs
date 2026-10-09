@@ -43,11 +43,11 @@ async fn main() {
     let mut app = routes::router::create_router(state);
 
     // === cors setup ===
-
     let frontend_url = std::env::var("FRONTEND_URL").expect("FRONTEND_URL must be set");
     let cors = CorsLayer::new()
         .allow_origin(frontend_url.parse::<HeaderValue>().unwrap())
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_credentials(true)
         .allow_headers([
             axum::http::header::CONTENT_TYPE,
             axum::http::header::AUTHORIZATION,

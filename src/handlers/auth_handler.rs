@@ -1,5 +1,10 @@
 use crate::{ApiResponse, AppError, AppState, services::auth_service, utils::jwt};
-use axum::{Json, extract::State, http::StatusCode};
+use axum::{
+    Json,
+    extract::State,
+    http::{HeaderValue, StatusCode, header::SET_COOKIE},
+    response::IntoResponse,
+};
 use serde::Deserialize;
 use serde_json::json;
 use validator::Validate;
@@ -54,7 +59,7 @@ pub struct SignInRequest {
 pub async fn sign_in(
     State(state): State<AppState>,
     Json(payload): Json<SignInRequest>,
-) -> Result<ApiResponse, AppError> {
+) -> Result<axum::response::Response, AppError> {
     payload.validate()?;
 
     let user = auth_service::login(&state.database, &payload.email, &payload.password).await?;
@@ -62,8 +67,23 @@ pub async fn sign_in(
     let token = jwt::create_token(user.id, user.email, user.username)
         .map_err(|_| AppError::Internal("something went wrong!".into()))?;
 
-    return Result::Ok(ApiResponse::Json(
+    let cookie_age = 60 * 60 * 24 * 30;
+    let cookie = format!(
+        "access_token={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        token, cookie_age
+    );
+
+    let mut response = ApiResponse::Json(
         StatusCode::OK,
         json!({"message":"sign in successful","token":token}),
-    ));
+    )
+    .into_response();
+
+    response.headers_mut().insert(
+        SET_COOKIE,
+        HeaderValue::from_str(&cookie)
+            .map_err(|_| AppError::Internal("something went wrong!".into()))?,
+    );
+
+    Ok(response)
 }
