@@ -36,7 +36,8 @@ pub async fn login(db: &PgPool, email: &str, password: &str) -> Result<User, App
 
     let user = user_repository::get_user_from_email(db, email).await?;
 
-    verify_password(password, &user.password_hash)?;
+    verify_password(password, &user.password_hash)
+        .map_err(|_| AppError::BadRequest("Email or password wrong".into()))?;
 
     Ok(user)
 }

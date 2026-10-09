@@ -72,7 +72,8 @@ impl From<ValidationErrors> for AppError {
 }
 
 impl From<argon2::password_hash::Error> for AppError {
-    fn from(_: argon2::password_hash::Error) -> Self {
+    fn from(error: argon2::password_hash::Error) -> Self {
+        tracing::error!("Database error: {error}");
         AppError::Internal("Failed to process password".into())
     }
 }
