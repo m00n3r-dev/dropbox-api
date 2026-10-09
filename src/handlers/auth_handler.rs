@@ -1,8 +1,7 @@
-use crate::{ApiResponse, AppError, AppState, models::user::User, utils::password::hash_password};
+use crate::{ApiResponse, AppError, AppState, services::auth_service};
 use axum::{Json, extract::State, http::StatusCode};
 use serde::Deserialize;
 use serde_json::json;
-use uuid::Uuid;
 use validator::Validate;
 
 // === sign up ===
@@ -26,8 +25,13 @@ pub async fn sign_up(
 ) -> Result<ApiResponse, AppError> {
     payload.validate()?;
 
-    let password_hash = hash_password(&payload.password)?;
-
+    let user = auth_service::register(
+        &state.database,
+        &payload.email,
+        &payload.username,
+        &payload.password,
+    )
+    .await?;
 
     return Result::Ok(ApiResponse::Json(
         StatusCode::CREATED,
