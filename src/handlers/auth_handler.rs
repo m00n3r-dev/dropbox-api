@@ -44,6 +44,6 @@ pub async fn sign_up(
 
     return Result::Ok(ApiResponse::Json(
         StatusCode::CREATED,
-        json!({"message":"sign up successful"}),
+        json!({"message":"sign up successful","user_id":user.id}),
     ));
 }

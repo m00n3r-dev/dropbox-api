@@ -66,3 +66,17 @@ impl From<ValidationErrors> for AppError {
         AppError::BadRequest(error.to_string())
     }
 }
+
+impl From<argon2::password_hash::Error> for AppError {
+    fn from(_: argon2::password_hash::Error) -> Self {
+        AppError::Internal("Failed to process password".into())
+    }
+}
+
+impl From<sqlx::Error> for AppError {
+    fn from(error: sqlx::Error) -> Self {
+        tracing::error!("Database error: {error}");
+
+        AppError::Internal("Database error".into())
+    }
+}
