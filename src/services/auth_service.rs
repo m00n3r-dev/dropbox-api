@@ -24,3 +24,12 @@ pub async fn register(
     let user = user_repository::create(db, email, username, &password_hash).await?;
     Ok(user)
 }
+
+pub async fn login(db: &PgPool, email: &str, password: &str) -> Result<User, AppError> {
+    let email_exists = user_repository::email_exists(db, email).await?;
+    if !email_exists {
+        return Err(AppError::Unauthorized("Email or password wrong".into()));
+    }
+
+    
+}
