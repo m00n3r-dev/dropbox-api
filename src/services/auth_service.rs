@@ -56,7 +56,7 @@ pub async fn login(db: &PgPool, email: &str, password: &str) -> Result<LoginResp
     let refresh_token = Uuid::new_v4();
     let refresh_token_hash = hash_string(&refresh_token.to_string())?;
 
-    let refresh_token_exp = chrono::Utc::now().timestamp() + 60 * 60 * 24 * 30;
+    let refresh_token_exp = chrono::Utc::now() + chrono::Duration::days(30);
 
     user_refresh_token_repository::create(
         db,

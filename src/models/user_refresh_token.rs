@@ -10,5 +10,5 @@ pub struct UserRefreshToken {
     pub created_at: DateTime<Utc>,
     pub is_revoked: bool,
     pub expires_at: DateTime<Utc>,
-    pub replace_by_token_id: Uuid,
+    pub replace_by_token_id: Option<Uuid>,
 }
