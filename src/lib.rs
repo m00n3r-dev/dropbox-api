@@ -8,10 +8,10 @@ use validator::ValidationErrors;
 
 pub mod handlers;
 pub mod models;
-pub mod routes;
-pub mod utils;
-pub mod services;
 pub mod repositories;
+pub mod routes;
+pub mod services;
+pub mod utils;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -41,6 +41,7 @@ pub enum AppError {
     NotFound(String),
     BadRequest(String),
     Unauthorized,
+    Conflict(String),
     Internal(String),
 }
 
@@ -50,6 +51,7 @@ impl IntoResponse for AppError {
             AppError::NotFound(msg) => (StatusCode::NOT_FOUND, msg),
             AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg),
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "Unauthorized".into()),
+            AppError::Conflict(msg) => (StatusCode::CONFLICT, msg),
             AppError::Internal(msg) => {
                 tracing::error!("Internal error: {msg}");
                 (

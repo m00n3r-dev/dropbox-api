@@ -23,3 +23,17 @@ pub async fn create(
     .fetch_one(db)
     .await;
 }
+
+pub async fn email_exists(db: &PgPool, email: &str) -> Result<bool, sqlx::Error> {
+    return sqlx::query_scalar("SELECT EXISTS (SELECT 1 FROM users WHERE email = $1)")
+        .bind(email)
+        .fetch_one(db)
+        .await;
+}
+
+pub async fn username_exists(db: &PgPool, username: &str) -> Result<bool, sqlx::Error> {
+    return sqlx::query_scalar("SELECT EXISTS (SELECT 1 FROM users WHERE username = $1)")
+        .bind(username)
+        .fetch_one(db)
+        .await;
+}

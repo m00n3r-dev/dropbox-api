@@ -10,6 +10,16 @@ pub async fn register(
     username: &str,
     password: &str,
 ) -> Result<User, AppError> {
+    let email_exists = user_repository::email_exists(db, email).await?;
+    if email_exists {
+        return Err(AppError::Conflict("Email already exists".into()));
+    }
+
+    let username_exists = user_repository::username_exists(db, username).await?;
+    if username_exists {
+        return Err(AppError::Conflict("Username already exists".into()));
+    }
+
     let password_hash = hash_password(password)?;
     let user = user_repository::create(db, email, username, &password_hash).await?;
     Ok(user)
